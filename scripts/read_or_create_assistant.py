@@ -12,7 +12,7 @@ def read_or_create_assistant():
         with open(assist_file_path, 'r') as file:
             content = file.read().strip()
             if content.startswith("asst_"):
-                print("Assistent já existe. Pulando o script.")
+                print("Assistente já existe. Pulando o script.")
                 return content
 
 
