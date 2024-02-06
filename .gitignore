@@ -10,7 +10,7 @@ instance/
 # Environments
 .env
 .venv
-env_ai/
+env_aistartup/
 venv/
 ENV/
 env.bak/
