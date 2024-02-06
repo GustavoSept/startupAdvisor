@@ -7,14 +7,12 @@ load_dotenv()
 
 st.title("Mestre Supremo das Ideias de Startup")
 
-AVATAR_USUARIO = ["🙂","🙂","🙂","🙂", "😲", "🤔", "🫣", "🤗", "😖", "😌", "🤫"]
+AVATAR_USUARIO = ["🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂", "😲", "🤔", "🫣", "🤗", "😖", "😌", "🤫"]
 AVATAR_BOT = "🥸"
 
 # guarda o contexto da lista de emojis do AVATAR_USUARIO
-if 'emoji_idxList' not in st.session_state:
-    st.session_state['emoji_idxList'] = [0]
 if 'emoji_counter' not in st.session_state:
-    st.session_state['emoji_counter'] = 0
+    st.session_state['emoji_state'] = 0
 
 client = OpenAI()
 
@@ -61,17 +59,9 @@ if not st.session_state.messages:
 def randNum():
     """
         Retorna um número aleatório para escolher um emoji aleatório para o usuário.
-        Mantém o histórico de qual emoji já foi usado, para ser consistente a cada rodada de resposta.
     """
-    num = random.randint(0, len(AVATAR_USUARIO) - 1)
-
-    # guardando no contexto da sessão
-    st.session_state['emoji_idxList'].append(num)
-    st.session_state['emoji_counter'] += 1
-
-    print(f"emoji_idxList: {st.session_state['emoji_idxList']}")
-    print(f"emoji_counter: {st.session_state['emoji_counter']}")
-    return num
+    
+    return random.randint(0, len(AVATAR_USUARIO) - 1)
 
 with st.sidebar:
     if st.button("Deletar Conversa"):
@@ -84,21 +74,20 @@ with st.sidebar:
         defaultMessage()
 
         # Reseta os emojis
-        st.session_state['emoji_idxList'] = [0]
-        st.session_state['emoji_counter'] = 0
+        st.session_state['emoji_state'] = 0
 
 # Renderizando as mensagens do chat
 for message in st.session_state.messages:
-    avatar = AVATAR_USUARIO[st.session_state['emoji_idxList'][st.session_state['emoji_counter']]] if message["role"] == "user" else AVATAR_BOT
+    avatar = AVATAR_USUARIO[st.session_state['emoji_state']] if message["role"] == "user" else AVATAR_BOT
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
 # Interface principal do chat | streaming de mensagens
 if prompt := st.chat_input("Como posso ajudá-lo?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar=AVATAR_USUARIO[st.session_state['emoji_idxList'][st.session_state['emoji_counter']]]):
+    with st.chat_message("user", avatar=AVATAR_USUARIO[st.session_state['emoji_state']]):
         if st.session_state.messages:
-            randNum()            
+            st.session_state['emoji_state'] = randNum()      
         st.markdown(prompt)
 
     with st.chat_message("assistant", avatar=AVATAR_BOT):
