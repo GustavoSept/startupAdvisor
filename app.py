@@ -85,7 +85,6 @@ def appendToEmojiMapping(num):
         file.write(f"0\n")
 
 emoji_mapping = loadEmojiMapping()
-print(emoji_mapping)
 
 def assignEmojiForNewMessage():
     new_emoji_index = randNum()
@@ -110,8 +109,6 @@ with st.sidebar:
 
 # Renderizando as mensagens do chat
 for idx, message in enumerate(st.session_state.messages):
-    print(f"idx: {idx}")
-    print(f"message: {message['role']}\n")
     if message['role'] == 'user':
         avatar = AVATAR_USUARIO[emoji_mapping[idx]]
     else:
@@ -121,7 +118,7 @@ for idx, message in enumerate(st.session_state.messages):
 
 
 # Interface principal do chat | streaming de mensagens
-if prompt := st.chat_input("Como posso ajudá-lo?"):
+if prompt := st.chat_input("Descreva sua grandiosa ideia!"):
     assignEmojiForNewMessage()
     st.session_state.messages.append({
         "role": "user",
