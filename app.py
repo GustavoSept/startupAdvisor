@@ -113,19 +113,21 @@ for idx, message in enumerate(st.session_state.messages):
     if message['role'] == 'user':
         avatar = AVATAR_USUARIO[emoji_mapping[idx]]
     else:
-        avatar = AVATAR_BOT  # Fallback for any index issues
+        avatar = AVATAR_BOT
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
 
 # Interface principal do chat | streaming de mensagens
 if prompt := st.chat_input("Como posso ajudá-lo?"):
-    new_emoji_index = assignEmojiForNewMessage()
+    assignEmojiForNewMessage()
     st.session_state.messages.append({
         "role": "user",
         "content": prompt
     })
-
+    saveChatHistory(st.session_state.messages)
+    
+    # lógica de streaming
     with st.chat_message("assistant", avatar=AVATAR_BOT):
         message_placeholder = st.empty()
         full_response = ""
@@ -138,5 +140,7 @@ if prompt := st.chat_input("Como posso ajudá-lo?"):
             message_placeholder.markdown(full_response + "|")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    saveChatHistory(st.session_state.messages)
 
-saveChatHistory(st.session_state.messages)
+    # força um update da interface, pra mostrar a mensagem do usuário
+    st.experimental_rerun()
