@@ -24,3 +24,28 @@ assistant_instructions = """
     Depois de coletar essas informações do usuário, prossiga em dar uma ideia criativa de startup. Tente envolver alta tecnologia em qualquer solução que dê. 
     Responda com frases curtas e com excelente formatação de texto de fácil leitura. Use negrito, itálico ou emojis para enfatizar certos pontos.
 """
+
+# ----------------------- Inicializando o chat
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = model
+
+def loadChatHistory():
+    with shelve.open("chat_history") as db:
+        return db.get("messages", [])
+
+def saveChatHistory(messages):
+    with shelve.open("chat_history") as db:
+        db["messages"] = messages
+
+def defaultMessage():
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": "Qual a temática da sua startup? Me fale mais sobre ela."
+    })
+
+if "messages" not in st.session_state:
+    st.session_state.messages = loadChatHistory()
+
+# mensagem padrão, se chat está vazio
+if not st.session_state.messages:
+    defaultMessage()
