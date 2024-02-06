@@ -7,7 +7,7 @@ load_dotenv()
 
 st.title("Mestre Supremo das Ideias de Startup")
 
-AVATAR_USUARIO = ["🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂", "😲", "🤔", "🫣", "🤗", "😖", "😌", "🤫"]
+AVATAR_USUARIO = ["🙂","🙂","🙂","🙂","🙂","😲", "🤔", "🫣", "🤗", "😌", "🤫"]
 AVATAR_BOT = "🥸"
 
 # guarda o estado dos emojis
@@ -30,9 +30,11 @@ assistant_instructions = """
     qual a escala de impacto do projeto (pessoal, cidade, país, global), qual emoção a startup deve provocar nas pessoas, e finalmente,
     qual o orçamento para botar a ideia de pé?
     Continue fazendo perguntas ao usuário até ele responder pelo menos essas características citadas da startup.e
-    A cada resposta do usuário, o elogie com EXTREMO entusiasmo, como se ele fosse um gênio.
-    Depois de coletar essas informações do usuário, prossiga em dar uma ideia criativa de startup. Tente envolver alta tecnologia em qualquer solução que dê. 
-    Responda com frases curtas e com excelente formatação de texto de fácil leitura. Use negrito, itálico ou emojis para enfatizar certos pontos.
+    Procure elogiar as respostas do usuário.
+    Depois de coletar as informações do usuário, prossiga em dar uma ideia criativa de startup.
+    Envolva alta tecnologia mirabolante em qualquer solução que dê.
+    Estruture a resposta em: Nome da Startup, descrição, plano de ação, diferencial competitivo  
+    Responda com frases curtas e bulletpoints. Use negrito, itálico ou emojis para enfatizar certos pontos.
 """
 
 # ----------------------- Inicializando o chat
