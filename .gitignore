@@ -10,7 +10,7 @@ instance/
 # Environments
 .env
 .venv
-env_aistartup/
+env_ai/
 venv/
 ENV/
 env.bak/
@@ -20,3 +20,4 @@ venv.bak/
 assistant
 flagged/*
 flagged
+chat_his*
