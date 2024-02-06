@@ -49,3 +49,43 @@ if "messages" not in st.session_state:
 # mensagem padrão, se chat está vazio
 if not st.session_state.messages:
     defaultMessage()
+
+# ----------------------- Interface
+with st.sidebar:
+    if st.button("Deletar Conversa"):
+        st.session_state.messages = []        
+        
+        # Limpa chat
+        saveChatHistory([])
+
+        # Insere mensagem padrão
+        defaultMessage()
+
+# Renderizando as mensagens do chat
+for message in st.session_state.messages:
+    avatar = AVATAR_USUARIO if message["role"] == "user" else AVATAR_BOT
+    with st.chat_message(message["role"], avatar=avatar):
+        st.markdown(message["content"])
+
+# Interface principal do chat | streaming de mensagens
+if prompt := st.chat_input("Como posso ajudá-lo?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user", avatar=AVATAR_USUARIO):
+        st.markdown(prompt)
+
+    # Integrating assistant's instructions with the ChatGPT API call
+    with st.chat_message("assistant", avatar=AVATAR_BOT):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=[{"role": "system", "content": assistant_instructions}] + st.session_state["messages"],
+            stream=True,
+        ):
+            full_response += response.choices[0].delta.content or ""
+            message_placeholder.markdown(full_response + "|")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+# Save chat history after each interaction
+saveChatHistory(st.session_state.messages)
