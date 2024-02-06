@@ -142,4 +142,4 @@ if prompt := st.chat_input("Descreva sua grandiosa ideia!"):
     saveChatHistory(st.session_state.messages)
 
     # força um update da interface, pra mostrar a mensagem do usuário
-    st.experimental_rerun()
+    st.rerun()
