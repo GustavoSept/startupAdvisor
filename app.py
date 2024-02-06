@@ -7,12 +7,18 @@ load_dotenv()
 
 st.title("Mestre Supremo das Ideias de Startup")
 
-AVATAR_USUARIO = ["🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂", "😲", "🤔", "🫣", "🤗", "😖", "😌", "🤫"]
+AVATAR_USUARIO = ["🙂","🙂","🙂","🙂","🙂","🙂","🙂","🙂", "😲", "🤔", "🫣", "🤗", "😖", "😌", "🤫"]
 AVATAR_BOT = "🥸"
 
-# guarda o contexto da lista de emojis do AVATAR_USUARIO
-if 'emoji_counter' not in st.session_state:
-    st.session_state['emoji_state'] = 0
+# guarda o estado dos emojis
+state_dir = './state/'
+if not os.path.exists(state_dir):
+    os.makedirs(state_dir)
+
+emoji_mapping_file = os.path.join(state_dir, 'emoji_mapping.txt')
+if not os.path.exists(emoji_mapping_file):
+    with open(emoji_mapping_file, 'w') as f:
+        f.write("0\n")
 
 client = OpenAI()
 
@@ -58,10 +64,32 @@ if not st.session_state.messages:
     
 def randNum():
     """
-        Retorna um número aleatório para escolher um emoji aleatório para o usuário.
+        Retorna um número aleatório para escolher um emoji para o usuário.
     """
     
     return random.randint(0, len(AVATAR_USUARIO) - 1)
+
+def loadEmojiMapping():
+    try:
+        with open('./state/emoji_mapping.txt', 'r') as file:
+            mapping = [int(line.strip()) for line in file.readlines()]
+    except FileNotFoundError:
+        mapping = []
+    return mapping
+
+def appendToEmojiMapping(num):
+    with open('./state/emoji_mapping.txt', 'a') as file:
+        file.write(f"{num}\n")
+        file.write(f"0\n")
+
+emoji_mapping = loadEmojiMapping()
+print(emoji_mapping)
+
+def assignEmojiForNewMessage():
+    new_emoji_index = randNum()
+    emoji_mapping.append(new_emoji_index)
+    appendToEmojiMapping(new_emoji_index)
+    return new_emoji_index
 
 with st.sidebar:
     if st.button("Deletar Conversa"):
@@ -74,21 +102,29 @@ with st.sidebar:
         defaultMessage()
 
         # Reseta os emojis
-        st.session_state['emoji_state'] = 0
+        emoji_mapping = []
+        with open(emoji_mapping_file, 'w') as f:
+            f.write("0\n")
 
 # Renderizando as mensagens do chat
-for message in st.session_state.messages:
-    avatar = AVATAR_USUARIO[st.session_state['emoji_state']] if message["role"] == "user" else AVATAR_BOT
+for idx, message in enumerate(st.session_state.messages):
+    print(f"idx: {idx}")
+    print(f"message: {message['role']}\n")
+    if message['role'] == 'user':
+        avatar = AVATAR_USUARIO[emoji_mapping[idx]]
+    else:
+        avatar = AVATAR_BOT  # Fallback for any index issues
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
+
 # Interface principal do chat | streaming de mensagens
 if prompt := st.chat_input("Como posso ajudá-lo?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar=AVATAR_USUARIO[st.session_state['emoji_state']]):
-        if st.session_state.messages:
-            st.session_state['emoji_state'] = randNum()      
-        st.markdown(prompt)
+    new_emoji_index = assignEmojiForNewMessage()
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt
+    })
 
     with st.chat_message("assistant", avatar=AVATAR_BOT):
         message_placeholder = st.empty()
